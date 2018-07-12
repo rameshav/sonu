@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	
+	<!-- 	Appender for audit logs, starts >> -->
+    <appender name="FILE_AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${LOG_PATH}/audit.log</file>
+	    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf-8</charset>
+		    <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %class{36}.%M - %msg%n</Pattern>
+		</encoder>
+	
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	        <!-- rollover daily -->
+	        <fileNamePattern>${LOG_PATH}/audit.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+	        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+	            <maxFileSize>100MB</maxFileSize>
+	        </timeBasedFileNamingAndTriggeringPolicy>
+	    </rollingPolicy>
+	</appender>
+	<!-- 	Appender for audit logs, ends << -->
+	
+	<!-- 	Appender for trace-route logs, starts >> -->
+    <appender name="FILE_TRACEROUTE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${LOG_PATH}/traceroute.log</file>
+	    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf-8</charset>
+		    <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %class{36}.%M - %msg%n</Pattern>
+		</encoder>
+	
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	        <!-- rollover daily -->
+	        <fileNamePattern>${LOG_PATH}/traceroute.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+	        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+	            <maxFileSize>100MB</maxFileSize>
+	        </timeBasedFileNamingAndTriggeringPolicy>
+	    </rollingPolicy>
+	</appender>
+	<!-- 	Appender for trace-route logs, ends << -->
+	
+	
+	<!-- 	Appender for persistence logs, starts >> -->
+    <appender name="FILE_PERSISTENCE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${LOG_PATH}/persistence.log</file>
+	    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf-8</charset>
+		    <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %class{36}.%M - %msg%n</Pattern>
+		</encoder>
+	
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	        <!-- rollover daily -->
+	        <fileNamePattern>${LOG_PATH}/persistence.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+	        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+	            <maxFileSize>100MB</maxFileSize>
+	        </timeBasedFileNamingAndTriggeringPolicy>
+	    </rollingPolicy>
+	</appender>
+	<!-- 	Appender for persistence logs, ends << -->
+		
+	<!-- 	Appender for itrack logs, starts >> -->
+    <appender name="FILE_ITRACK" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	    <file>${LOG_PATH}/itrack.log</file>
+	    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>utf-8</charset>
+		    <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %class.%M - %msg%n</Pattern>
+		</encoder>
+	
+	    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+	        <!-- rollover daily -->
+	        <fileNamePattern>${LOG_PATH}/itrack.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+	        <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+	            <maxFileSize>100MB</maxFileSize>
+	        </timeBasedFileNamingAndTriggeringPolicy>
+	    </rollingPolicy>
+	</appender>
+	<!-- 	Appender for itrack logs, ends << -->
+    
+	<!-- 	Logging configurations for prod profile, starts >> -->
+    <springProfile name="prod">        
+	    <appender name="ASYNC_AUDIT_LOG" class="ch.qos.logback.classic.AsyncAppender">
+	        <queueSize>512</queueSize>
+	        <appender-ref ref="FILE_AUDIT"/>
+	    </appender>
+	    <appender name="ASYNC_TRACEROUTE_LOG" class="ch.qos.logback.classic.AsyncAppender">
+	        <queueSize>512</queueSize>
+	        <appender-ref ref="FILE_TRACEROUTE"/>
+	    </appender>
+	    <appender name="ASYNC_PERSISTENCE_LOG" class="ch.qos.logback.classic.AsyncAppender">
+	        <queueSize>512</queueSize>
+	        <appender-ref ref="FILE_PERSISTENCE"/>
+	    </appender>
+	    <appender name="ASYNC_ITRACK_LOG" class="ch.qos.logback.classic.AsyncAppender">
+	        <queueSize>512</queueSize>
+	        <appender-ref ref="FILE_ITRACK"/>
+	    </appender>
+	    
+        <root level="DEBUG">
+            <appender-ref ref="ASYNC_ITRACK_LOG" />
+        </root>
+        
+        <logger name="AUDIT_LOG" additivity="false">
+		    <appender-ref ref="ASYNC_AUDIT_LOG" />
+		</logger>
+        <logger name="ASYNC_TRACEROUTE_LOG" additivity="false">
+		    <appender-ref ref="FILE_TRACEROUTE" />
+		</logger>
+		<logger name="org.hibernate" level="TRACE" additivity="false">
+	        <appender-ref ref="ASYNC_PERSISTENCE_LOG"/>
+	    </logger>
+        <logger name="ASYNC_ITRACK_LOG" additivity="false">
+		    <appender-ref ref="FILE_ITRACK" />
+		</logger>
+    </springProfile>
+	<!-- 	Logging configurations for prod profile, ends <<  -->
+    
+	<!-- 	Logging configurations for dev profile, starts >>  -->
+    <springProfile name="dev">
+        <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+        <root level="DEBUG">
+            <appender-ref ref="FILE_ITRACK" />
+            <appender-ref ref="CONSOLE" />
+        </root>
+        
+        <logger name="AUDIT_LOG" additivity="false">
+		    <appender-ref ref="FILE_AUDIT" />
+		</logger>
+        <logger name="TRACEROUTE_LOG" additivity="false">
+		    <appender-ref ref="FILE_TRACEROUTE" />
+		</logger>
+		<logger name="org.hibernate" level="DEBUG" additivity="false">
+	        <appender-ref ref="FILE_PERSISTENCE"/>
+	    </logger>
+        <logger name="ITRACK_LOG" additivity="false">
+		    <appender-ref ref="FILE_ITRACK" />
+		</logger>
+    </springProfile>
+	<!-- 	Logging configurations for dev profile, ends <<  -->
+    
+    <logger name="javax.activation" level="WARN"/>
+    <logger name="javax.mail" level="WARN"/>
+    <logger name="javax.xml.bind" level="WARN"/>
+    <logger name="ch.qos.logback" level="WARN"/>
+    <logger name="com.codahale.metrics" level="WARN"/>
+    <logger name="com.ryantenney" level="WARN"/>
+    <logger name="com.sun" level="WARN"/>
+    <logger name="com.zaxxer" level="WARN"/>
+    <logger name="io.undertow" level="WARN"/>
+    <logger name="io.undertow.websockets.jsr" level="ERROR"/>
+    <logger name="org.ehcache" level="WARN"/>
+    <logger name="org.apache" level="WARN"/>
+    <logger name="org.apache.catalina.startup.DigesterFactory" level="OFF"/>
+    <logger name="org.bson" level="WARN"/>
+    <logger name="org.hibernate.validator" level="WARN"/>
+  	<logger name="org.hibernate.type" level="ALL" />
+    <logger name="org.hibernate" level="DEBUG"/>
+    <logger name="org.hibernate.ejb.HibernatePersistence" level="OFF"/>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.springframework.web" level="WARN"/>
+    <logger name="org.springframework.security" level="WARN"/>
+    <logger name="org.springframework.cache" level="WARN"/>
+    <logger name="org.thymeleaf" level="WARN"/>
+    <logger name="org.xnio" level="WARN"/>
+    <logger name="springfox" level="WARN"/>
+    <logger name="sun.rmi" level="WARN"/>
+    <logger name="liquibase" level="WARN"/>
+    <logger name="LiquibaseSchemaResolver" level="INFO"/>
+    <logger name="sun.rmi.transport" level="WARN"/>
+    
+    <!-- https://logback.qos.ch/manual/configuration.html#shutdownHook and https://jira.qos.ch/browse/LOGBACK-1090 -->
+    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+    
+</configuration>

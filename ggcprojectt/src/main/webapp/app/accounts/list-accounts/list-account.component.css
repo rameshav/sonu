@@ -1,0 +1,10 @@
+.list-account .container{
+    padding: 0;
+    max-width: 100%;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+.list-account .add-acount-button{
+    float: right;
+}
